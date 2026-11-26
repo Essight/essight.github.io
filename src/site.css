@@ -162,7 +162,6 @@ code {
   font-size: 0.88em;
 }
 
-.empty code,
 .lede code {
   background: var(--code-bg);
   padding: 0.08em 0.35em;
@@ -740,19 +739,11 @@ code {
 }
 
 .deck,
-.chapter-copy p,
-.disclaimer,
-.note {
+.chapter-copy p {
   margin: 0.7rem 0 0;
   color: rgba(244, 239, 228, 0.84);
   font-size: 1.02rem;
   line-height: 1.75;
-}
-
-.disclaimer,
-.note {
-  color: rgba(244, 239, 228, 0.66);
-  font-size: 0.92rem;
 }
 
 .cue {
@@ -763,37 +754,6 @@ code {
   color: rgba(244, 239, 228, 0.7);
   font-size: 0.85rem;
   letter-spacing: 0.04em;
-}
-
-.cue-line {
-  width: 2.2rem;
-  height: 1px;
-  background: var(--copper);
-  transform-origin: left center;
-  animation: cue 1.8s ease-in-out infinite;
-}
-
-@keyframes cue {
-  0%,
-  100% { transform: scaleX(0.35); opacity: 0.45; }
-  50% { transform: scaleX(1); opacity: 1; }
-}
-
-.pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-  margin: 1rem 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.pills li {
-  border: 1px solid rgba(215, 176, 122, 0.45);
-  border-radius: 999px;
-  padding: 0.15rem 0.7rem;
-  color: var(--cream);
-  font-size: 0.82rem;
 }
 
 .chain-copy-wrap {
@@ -893,46 +853,6 @@ code {
   color: #1e3f36;
 }
 
-.archive-lead {
-  margin: 0 0 1.4rem;
-  color: #5c564c;
-  line-height: 1.75;
-}
-
-.archive-lead code,
-.chapter-paper code {
-  font-family: var(--mono);
-  font-size: 0.88em;
-  background: #f1ece3;
-  padding: 0.08em 0.35em;
-  border-radius: 0.25rem;
-}
-
-.steps {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.55rem;
-  margin: 0 0 1.6rem;
-  padding: 0;
-  list-style: none;
-}
-
-.steps li {
-  display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
-  padding: 0.75rem 0;
-  border-top: 1px solid #e0d9cc;
-  font-size: 1.05rem;
-}
-
-.steps span {
-  color: #1e3f36;
-  font-variant-numeric: tabular-nums;
-  font-size: 0.82rem;
-  letter-spacing: 0.08em;
-}
-
 .chapter-paper .empty {
   margin-top: 0.4rem;
 }
@@ -1006,19 +926,6 @@ code {
     padding: 12vh 8vw 12vh 8.5rem;
   }
 
-  .steps {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .steps li {
-    display: block;
-  }
-
-  .steps span {
-    display: block;
-    margin-bottom: 0.35rem;
-  }
-
   .chain ol {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0.7rem;
@@ -1069,7 +976,6 @@ code {
     scroll-snap-type: none;
   }
 
-  .cue-line,
   .chain-beam {
     animation: none;
     transition: none;

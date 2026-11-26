@@ -56,8 +56,23 @@ check(index.includes("Essight Notes"), "首页有英文名称");
 check(!index.includes("数据科学专栏"), "首页不再使用旧栏目名");
 check(!notFound.includes("数据科学专栏"), "404 不再使用旧栏目名");
 check(feed.includes("萃见札记 · Essight Notes"), "订阅源使用正式名称");
-check(index.includes("暂无已发布文章"), "首页有空列表提示");
-check(index.includes("不是测量结果"), "首页声明图形不是测量结果");
+check(index.includes("暂无文章。"), "文章幕空状态为一行");
+check(!index.includes("暂无已发布文章"), "空状态不再解释发布条件");
+check(!index.includes("文稿仓库"), "页面没有文稿仓库入口");
+check(!index.includes("github.com/Essight/essight.github.io"), "首页不链向文稿仓库");
+check(!index.includes("GitHub Actions"), "首页不提自动构建");
+check(!index.includes("Pull Request"), "首页不提 Pull Request");
+check(!index.includes("审核"), "首页不提审核流程");
+check(!index.includes("不是测量结果"), "序幕不再声明图形不是测量结果");
+check(!index.includes("由固定规则绘成"), "序幕不再解释绘图规则");
+check(!index.includes("向下滚动"), "序幕不再提示如何换幕");
+check(!index.includes("不是任何模型"), "拓扑不再自证不是嵌入");
+check(!index.includes("没有样本"), "区间不再声明没有样本");
+check(!index.includes("不是一次实验的结果"), "证据链不再声明不是实验结果");
+check(index.includes("应当能被观察、被判断"), "序幕保留主副句");
+check(index.includes('href="/feed.xml">订阅</a>'), "页脚保留订阅");
+check(!notFound.includes("文稿仓库"), "404 没有文稿仓库入口");
+check(!notFound.includes("这个地址没有对应的文章或页面"), "404 不再重复说明");
 check(index.includes('id="chain"'), "首页有证据链一幕");
 check(index.includes("Observation"), "证据链保留 Observation");
 check(index.includes("完整日 L1"), "证据链保留完整日 L1");
@@ -229,9 +244,11 @@ summary: 较早的一篇，用于确认首页按日期倒序。
   check(!other.includes("脚注内容"), "另一篇文章不会串入脚注");
   check(article.includes('href="/assets/site.css"'), "文章页使用根路径样式");
   check(!article.includes("exhibit.js"), "文章页不加载展示脚本");
+  check(!article.includes("文稿仓库"), "文章页没有文稿仓库入口");
+  check(article.includes('href="/feed.xml">订阅</a>'), "文章页页脚保留订阅");
 
   const untouched = fs.readFileSync(path.join(real.outDir, "index.html"), "utf8");
-  check(untouched.includes("暂无已发布文章"), "自检构建没有改写正式首页");
+  check(untouched.includes("暂无文章。"), "自检构建没有改写正式首页");
   check(!untouched.includes("格式自检"), "正式首页没有自检标题");
 
   expectThrow(
