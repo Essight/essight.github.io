@@ -53,7 +53,19 @@ const katexCss = fs.readFileSync(path.join(real.outDir, "assets", "katex", "kate
 check(real.posts === 0, "正式构建不包含文章");
 check(index.includes("GEO 数据科学专栏"), "首页有专栏名称");
 check(index.includes("暂无已发布文章"), "首页有空列表提示");
+check(index.includes("不是测量结果"), "首页声明图形不是测量结果");
+check(index.includes('id="chain"'), "首页有证据链一幕");
+check(index.includes("Observation"), "证据链保留 Observation");
+check(index.includes("完整日 L1"), "证据链保留完整日 L1");
+check(index.includes("Snapshot"), "证据链保留 Snapshot");
 check(!index.includes("/posts/"), "首页没有文章链接");
+check(index.includes('src="/assets/exhibit.js"'), "首页使用站内脚本");
+check(index.includes("script-src 'self'"), "首页脚本策略允许同源脚本");
+const exhibit = fs.readFileSync(path.join(real.outDir, "assets", "exhibit.js"), "utf8");
+check(!/https?:\/\//.test(exhibit), "首页脚本不引用外部地址");
+check(exhibit.includes("prefers-reduced-motion"), "首页脚本尊重减少动态效果");
+check(css.includes("prefers-reduced-motion"), "样式尊重减少动态效果");
+check(notFound.includes('src="/assets/exhibit.js"'), "404 使用同一套站内脚本");
 check(index.includes('href="/assets/site.css"'), "首页引用样式");
 check(index.includes('href="/assets/katex/katex.min.css"'), "首页引用 KaTeX 样式");
 check(index.includes('lang="zh-CN"'), "页面语言为简体中文");
@@ -212,6 +224,7 @@ summary: 较早的一篇，用于确认首页按日期倒序。
   check(!/<\s*script(?![^>]*type="application\/ld\+json")/i.test(article), "文章页没有可执行脚本");
   check(!other.includes("脚注内容"), "另一篇文章不会串入脚注");
   check(article.includes('href="/assets/site.css"'), "文章页使用根路径样式");
+  check(!article.includes("exhibit.js"), "文章页不加载展示脚本");
 
   const untouched = fs.readFileSync(path.join(real.outDir, "index.html"), "utf8");
   check(untouched.includes("暂无已发布文章"), "自检构建没有改写正式首页");

@@ -2,15 +2,16 @@
 
 公开静态站点，发布地址为 [https://essight.github.io/](https://essight.github.io/)。
 
-本仓库只发布已经审核通过的文章。当前站点是阅读框架：首页有专栏介绍和空的文章列表，没有样例文章，也没有业务数据。
+本仓库只发布已经审核通过的文章。首页是专栏的展示页，图形只表达方法，不是测量结果；文章列表在没有审核稿时保持空白。没有样例文章，也没有业务数据。
 
 ## 技术方案
 
 站点由一个 Node.js 构建脚本生成，不使用 Jekyll、Astro 或 Eleventy。
 
 - 文章放在 `posts/*.md`，用 [gray-matter](https://github.com/jonschlinkert/gray-matter) 读取 frontmatter，用 [marked](https://marked.js.org/) 渲染 GitHub 风格 Markdown（含表格）。
-- 数学公式在构建时由 [KaTeX](https://katex.org/) 写成 HTML。页面不加载客户端 JavaScript，也不依赖公式 CDN。
-- 代码块在构建时用 highlight.js 着色。KaTeX 的样式和 woff2 字体、站点样式都输出到 `dist/assets/`，阅读时不请求第三方字体服务。
+- 数学公式在构建时由 [KaTeX](https://katex.org/) 写成 HTML，不依赖公式 CDN。
+- 首页和 404 使用仓库内的 `src/exhibit.js`（构建后为 `dist/assets/exhibit.js`）绘制信号场、提示词空间、分布区间和证据链。脚本不请求外部地址。文章页不加载这段脚本，以便长文阅读。系统开启「减少动态效果」时，动画停在静止帧。
+- 代码块在构建时用 highlight.js 着色。KaTeX 的样式和 woff2 字体、站点样式与脚本都输出到 `dist/assets/`，阅读时不请求第三方字体。
 - 中文排版使用系统字体：界面用苹方 / 思源黑体 / 微软雅黑，正文用宋体 / 思源宋体。版心约 36 个汉字，表格和长公式可以横向滚动。
 
 本地与 GitHub Actions 都使用 Node.js 22。`npm run check` 会先构建正式站点，再用临时文稿检查表格、代码、公式、脚注和参考文献，临时文件不会写入 `posts/`，也不会进入 `dist/`。
@@ -34,7 +35,7 @@ lib/                 读取文章、渲染 Markdown、生成页面
 posts/               已审核文章，一篇一个 posts/<slug>.md
 public/              原样复制到站点根目录的图片等文件
 scripts/             本地预览与构建自检
-src/                 样式和图标
+src/                 样式、首页脚本和图标
 build.mjs            构建入口
 site.config.mjs      站点名称、简介和正式域名
 ```

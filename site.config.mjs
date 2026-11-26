@@ -3,7 +3,7 @@ export const site = {
   column: "GEO 数据科学专栏",
   title: "Essight · GEO 数据科学专栏",
   description:
-    "发布经审核的中文技术与数据科学文章。文稿使用 Markdown 维护，支持表格、代码、参考文献与数学公式；合并到 main 分支后，会出现在首页列表和独立文章页。",
+    "Essight 的 GEO 数据科学专栏。以可复核的证据链讨论生成式检索中的信号、判断与日尺度记录，并发布经审核的中文技术文章。",
   url: "https://essight.github.io",
   lang: "zh-CN",
   locale: "zh_CN",
