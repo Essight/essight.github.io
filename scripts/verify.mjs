@@ -1,8 +1,11 @@
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { buildSite } from "../lib/build-site.mjs";
+import { emblemSvg } from "../lib/emblem.mjs";
 import { renderMarkdown } from "../lib/markdown.mjs";
+import { extractToc, readingMinutes } from "../lib/reading.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 let failed = 0;
@@ -73,7 +76,26 @@ check(index.includes("应当能被观察、被判断"), "序幕保留主副句")
 check(index.includes('href="/feed.xml">订阅</a>'), "页脚保留订阅");
 check(!notFound.includes("文稿仓库"), "404 没有文稿仓库入口");
 check(!notFound.includes("这个地址没有对应的文章或页面"), "404 不再重复说明");
+check(notFound.includes('data-exhibit="lost"'), "404 使用失落一幕");
 check(index.includes('id="chain"'), "首页有证据链一幕");
+for (const id of ["overture", "signal", "topology", "judgment", "interval", "chain", "archive"]) {
+  check(index.includes(`id="${id}"`), `首页有 ${id} 一幕`);
+}
+check(index.includes('<span class="sr-only">近与远，都要被观察</span>'), "逐字动画的标题保留完整文本给读屏");
+check(index.includes('class="split" aria-hidden="true"'), "逐字拆分的标题对读屏隐藏");
+check(!/<span class="ch"[^>]*>[，。、]/.test(index), "标点不会单独成为一行的行首");
+check(index.includes("GEO · 数据科学 · 实践"), "序幕写明栏目方向");
+check(index.includes('class="wm-dot"'), "英文名保留品牌金点");
+
+const csp = index.match(/http-equiv="Content-Security-Policy" content="([^"]+)"/)?.[1] ?? "";
+const bootScripts = [...index.matchAll(/<script>([^<]*)<\/script>/g)].map((match) => match[1]);
+check(bootScripts.length === 1, "首页只有一段内联启动脚本");
+check(
+  bootScripts.every((code) => csp.includes(`'sha256-${createHash("sha256").update(code).digest("base64")}'`)),
+  "内联启动脚本的哈希写入了脚本策略",
+);
+check(csp.includes("script-src 'self' 'sha256-") && !/script-src[^;]*unsafe-inline/.test(csp), "脚本策略不放开 unsafe-inline");
+check(!csp.includes("frame-ancestors"), "meta 中不写会被忽略的 frame-ancestors");
 check(index.includes("Observation"), "证据链保留 Observation");
 check(index.includes("完整日 L1"), "证据链保留完整日 L1");
 check(index.includes("Snapshot"), "证据链保留 Snapshot");
@@ -83,6 +105,12 @@ check(index.includes("script-src 'self'"), "首页脚本策略允许同源脚本
 const exhibit = fs.readFileSync(path.join(real.outDir, "assets", "exhibit.js"), "utf8");
 check(!/https?:\/\//.test(exhibit), "首页脚本不引用外部地址");
 check(exhibit.includes("prefers-reduced-motion"), "首页脚本尊重减少动态效果");
+check(exhibit.includes('getContext("webgl2"'), "首页脚本使用 WebGL2 绘制");
+check(exhibit.includes("no-gl"), "没有 WebGL2 时保留静态背景");
+check(exhibit.includes("window.__essight"), "首页脚本向启动脚本报到");
+check(!/\beval\(|new Function\(/.test(exhibit), "首页脚本不动态执行代码");
+check(css.includes("@view-transition"), "页面之间有视图过渡");
+check(css.includes("animation-timeline: scroll(root block)"), "文章阅读进度只用 CSS");
 check(css.includes("prefers-reduced-motion"), "样式尊重减少动态效果");
 check(notFound.includes('src="/assets/exhibit.js"'), "404 使用同一套站内脚本");
 check(index.includes('href="/assets/site.css"'), "首页引用样式");
@@ -159,6 +187,16 @@ check(footnote.includes("footnotes"), "脚注生成列表");
 check(footnote.includes("脚注内容"), "脚注保留正文");
 check(footnote.includes(">脚注</h2>") || footnote.includes(">脚注<"), "脚注标题为中文");
 
+const emblemA = emblemSvg("alpha-post");
+check(emblemA === emblemSvg("alpha-post"), "同一 slug 的生成图形保持一致");
+check(emblemA !== emblemSvg("beta-post"), "不同 slug 的生成图形不同");
+check(!/<script|on[a-z]+=/i.test(emblemA), "生成图形是纯 SVG");
+
+check(readingMinutes("<p>" + "字".repeat(2100) + "</p>") === 5, "阅读时长按中文字数估算");
+check(readingMinutes("<p>短</p>") === 1, "阅读时长至少一分钟");
+const toc = extractToc(renderMarkdown("# 甲\n\n## 乙\n\n### 丙\n\n# 丁\n"));
+check(toc.length === 3 && toc[1].level === 2, "目录取最高两级标题");
+
 const first = renderMarkdown("# 第一节\n\n## 第一节\n");
 const ids = [...first.matchAll(/id="([^"]+)"/g)].map((match) => match[1]);
 check(ids.length === 2 && ids[0] !== ids[1], "重复标题的锚点互不冲突");
@@ -190,6 +228,10 @@ references:
 
 中文句子里的 $R^2$。
 
+# 第一节
+
+## 小节
+
 $$
 \\hat{\\beta} = (X^{\\top} X)^{-1} X^{\\top} y
 $$
@@ -217,6 +259,8 @@ title: 排序自检
 date: 2020-01-01
 slug: sort-check
 summary: 较早的一篇，用于确认首页按日期倒序。
+tags:
+  - 排序
 ---
 
 只有一段正文，没有脚注。
@@ -246,6 +290,17 @@ summary: 较早的一篇，用于确认首页按日期倒序。
   check(!article.includes("exhibit.js"), "文章页不加载展示脚本");
   check(!article.includes("文稿仓库"), "文章页没有文稿仓库入口");
   check(article.includes('href="/feed.xml">订阅</a>'), "文章页页脚保留订阅");
+  check(article.includes('class="toc"') && article.includes('href="#第一节"'), "文章页有目录");
+  check(!other.includes('class="toc"'), "没有小节的文章不生成目录");
+  check(article.includes("约 1 分钟"), "文章页显示阅读时长");
+  check(article.includes("emblem emblem-hero"), "文章页有生成图形");
+  check(article.includes('rel="prev"') && article.includes("/posts/sort-check/"), "较新的文章指向较早的一篇");
+  check(other.includes('rel="next"') && other.includes("/posts/format-check/"), "较早的文章指向较新的一篇");
+  check(article.includes('content="light dark"'), "文章页跟随系统深浅色");
+  check(article.includes("view-transition-name: post-format-check"), "文章标题参与视图过渡");
+  check(home.includes("view-transition-name: post-format-check"), "列表标题参与视图过渡");
+  check(home.includes("emblem emblem-card"), "列表有生成图形");
+  check(home.includes('class="filters"'), "多标签时出现标签筛选");
 
   const untouched = fs.readFileSync(path.join(real.outDir, "index.html"), "utf8");
   check(untouched.includes("暂无文章。"), "自检构建没有改写正式首页");

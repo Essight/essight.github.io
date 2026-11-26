@@ -2,6 +2,7 @@ export const site = {
   name: "萃见札记",
   nameEn: "Essight Notes",
   title: "萃见札记 · Essight Notes",
+  tagline: "GEO · 数据科学 · 实践",
   description:
     "萃见札记 · Essight Notes。以可复核的证据链讨论生成式检索中的信号、判断与日尺度记录。",
   url: "https://essight.github.io",

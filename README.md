@@ -10,7 +10,10 @@
 
 - 文章放在 `posts/*.md`，用 [gray-matter](https://github.com/jonschlinkert/gray-matter) 读取 frontmatter，用 [marked](https://marked.js.org/) 渲染 GitHub 风格 Markdown（含表格）。
 - 数学公式在构建时由 [KaTeX](https://katex.org/) 写成 HTML，不依赖公式 CDN。
-- 首页和 404 使用仓库内的 `src/exhibit.js`（构建后为 `dist/assets/exhibit.js`）绘制信号场、提示词空间、分布区间和证据链。脚本不请求外部地址。文章页不加载这段脚本，以便长文阅读。系统开启「减少动态效果」时，动画停在静止帧。
+- 首页是一场按滚动推进的展示。`src/exhibit.js`（构建后为 `dist/assets/exhibit.js`）用 WebGL2 绘制一片粒子，在六幕之间变形：品牌标志、信号场、提示词空间、逐项判断、分布与区间、证据链；每一幕内部也随滚动推进。最后粒子收拢成品牌金点，金点展开为文章页。图形只表达方法，由固定规则和固定随机种子生成。脚本不请求外部地址，也不动态执行代码。
+- 键盘可以像放映一样换幕：↓、PageDown、空格前进，↑、PageUp、Shift+空格后退，Home、End 回到序幕或直达文章。证据链一幕的四个阶段既随滚动推进，也可以点选。
+- 系统开启「减少动态效果」时不播放开场，粒子静止，换幕直接切换。浏览器不支持 WebGL2 时保留静态背景；脚本没有加载时，所有文字照常显示。404 页沿用同一套脚本。
+- 文章页不加载脚本：目录、阅读时长、相邻文章在构建时生成；阅读进度条用 CSS 滚动时间线；每篇文章有一枚由 slug 决定的生成式图形（`lib/emblem.mjs`）；页面跟随系统深浅色。支持的浏览器在首页列表和文章页之间做标题过渡。
 - 代码块在构建时用 highlight.js 着色。KaTeX 的样式和 woff2 字体、站点样式与脚本都输出到 `dist/assets/`，阅读时不请求第三方字体。
 - 中文排版使用系统字体：界面用苹方 / 思源黑体 / 微软雅黑，正文用宋体 / 思源宋体。版心约 36 个汉字，表格和长公式可以横向滚动。
 
@@ -31,11 +34,11 @@ npm run preview
 
 ```text
 .github/workflows/   check.yml 在 Pull Request 上构建；pages.yml 在 main 上部署
-lib/                 读取文章、渲染 Markdown、生成页面
+lib/                 读取文章、渲染 Markdown、生成页面、文章图形与目录
 posts/               已审核文章，一篇一个 posts/<slug>.md
 public/              原样复制到站点根目录的图片等文件
 scripts/             本地预览与构建自检
-src/                 样式、首页脚本和图标
+src/                 样式、首页展示脚本和图标
 build.mjs            构建入口
 site.config.mjs      站点名称、简介和正式域名
 ```
