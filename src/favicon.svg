@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="萃见札记">
+  <rect width="32" height="32" rx="3" fill="#12161a"/>
+  <ellipse cx="16" cy="16" rx="10" ry="4.6" fill="none" stroke="#d7b07a" stroke-width="1.3"/>
+  <ellipse cx="16" cy="16" rx="10" ry="4.6" transform="rotate(60 16 16)" fill="none" stroke="#9ec9c2" stroke-width="1.3"/>
+  <ellipse cx="16" cy="16" rx="10" ry="4.6" transform="rotate(120 16 16)" fill="none" stroke="#f4efe4" stroke-width="1.3"/>
+  <circle cx="16" cy="16" r="1.6" fill="#f4efe4"/>
+</svg>
