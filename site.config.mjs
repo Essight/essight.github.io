@@ -1,9 +1,9 @@
 export const site = {
-  name: "Essight",
-  column: "GEO 数据科学专栏",
-  title: "Essight · GEO 数据科学专栏",
+  name: "萃见札记",
+  nameEn: "Essight Notes",
+  title: "萃见札记 · Essight Notes",
   description:
-    "Essight 的 GEO 数据科学专栏。以可复核的证据链讨论生成式检索中的信号、判断与日尺度记录，并发布经审核的中文技术文章。",
+    "萃见札记 · Essight Notes。以可复核的证据链讨论生成式检索中的信号、判断与日尺度记录，并发布经审核的中文技术文章。",
   url: "https://essight.github.io",
   lang: "zh-CN",
   locale: "zh_CN",

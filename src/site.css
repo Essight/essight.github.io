@@ -107,10 +107,18 @@ a {
   flex: none;
 }
 
+.brand-zh {
+  letter-spacing: 0.14em;
+  text-transform: none;
+  font-size: 0.95rem;
+}
+
 .brand-sep,
 .brand-column {
   color: var(--muted);
   font-size: 0.92rem;
+  letter-spacing: 0.04em;
+  text-transform: none;
 }
 
 h1,
@@ -726,15 +734,6 @@ code {
   font-size: clamp(2.5rem, 6vw, 4.7rem);
 }
 
-.title-en {
-  display: block;
-  margin-bottom: 0.22em;
-  color: var(--copper);
-  font-size: 0.34em;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-}
-
 .exhibit h2 {
   font-family: var(--sans);
   font-size: clamp(1.55rem, 4vw, 2.35rem);
@@ -954,6 +953,15 @@ code {
   width: min(36rem, calc(100% - 2.3rem));
   margin-inline: auto;
   padding-bottom: 18vh;
+}
+
+.lost-en {
+  margin: -0.35rem 0 0.85rem;
+  color: var(--copper);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
 .return {

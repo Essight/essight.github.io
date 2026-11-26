@@ -51,7 +51,11 @@ const css = fs.readFileSync(path.join(real.outDir, "assets", "site.css"), "utf8"
 const katexCss = fs.readFileSync(path.join(real.outDir, "assets", "katex", "katex.min.css"), "utf8");
 
 check(real.posts === 0, "正式构建不包含文章");
-check(index.includes("GEO 数据科学专栏"), "首页有专栏名称");
+check(index.includes("萃见札记"), "首页有中文名称");
+check(index.includes("Essight Notes"), "首页有英文名称");
+check(!index.includes("数据科学专栏"), "首页不再使用旧栏目名");
+check(!notFound.includes("数据科学专栏"), "404 不再使用旧栏目名");
+check(feed.includes("萃见札记 · Essight Notes"), "订阅源使用正式名称");
 check(index.includes("暂无已发布文章"), "首页有空列表提示");
 check(index.includes("不是测量结果"), "首页声明图形不是测量结果");
 check(index.includes('id="chain"'), "首页有证据链一幕");
