@@ -140,6 +140,17 @@ check(sitemap.includes("https://essight.github.io/posts/high-mention-rate-blind-
 check(feed.includes("<item>"), "订阅源包含文章");
 check(feed.includes("高提及率的盲区：从一组 95%+ 的 GEO 监测样本说起"), "订阅源使用文章标题");
 
+const siteVerificationName = "google4fad2d2f12275260.html";
+const siteVerificationPath = path.join(real.outDir, siteVerificationName);
+const siteVerification = fs.existsSync(siteVerificationPath) ? fs.readFileSync(siteVerificationPath, "utf8") : "";
+check(
+  siteVerification === "google-site-verification: google4fad2d2f12275260.html\n",
+  "构建产物根目录存在内容精确一致的 Google Search Console 验证文件",
+);
+check(!index.includes(siteVerificationName), "首页文章列表不包含验证文件");
+check(!sitemap.includes(siteVerificationName), "站点地图不包含验证文件");
+check(!feed.includes(siteVerificationName), "订阅源不包含验证文件");
+
 const published = fs.readFileSync(
   path.join(real.outDir, "posts", "high-mention-rate-blind-spot", "index.html"),
   "utf8",
