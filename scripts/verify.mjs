@@ -53,14 +53,17 @@ const robots = fs.readFileSync(path.join(real.outDir, "robots.txt"), "utf8");
 const css = fs.readFileSync(path.join(real.outDir, "assets", "site.css"), "utf8");
 const katexCss = fs.readFileSync(path.join(real.outDir, "assets", "katex", "katex.min.css"), "utf8");
 
-check(real.posts === 0, "正式构建不包含文章");
+check(real.posts === 1, "正式构建包含一篇文章");
 check(index.includes("萃见札记"), "首页有中文名称");
 check(index.includes("Essight Notes"), "首页有英文名称");
 check(!index.includes("数据科学专栏"), "首页不再使用旧栏目名");
 check(!notFound.includes("数据科学专栏"), "404 不再使用旧栏目名");
 check(feed.includes("萃见札记 · Essight Notes"), "订阅源使用正式名称");
-check(index.includes("暂无文章。"), "文章幕空状态为一行");
+check(!index.includes("暂无文章。"), "有文章时不显示空状态");
 check(!index.includes("暂无已发布文章"), "空状态不再解释发布条件");
+check(index.includes("高提及率的盲区：从一组 95%+ 的 GEO 监测样本说起"), "首页文章幕露出标题");
+check(index.includes('href="/posts/high-mention-rate-blind-spot/"'), "首页文章链接是站点根路径");
+check(!index.includes('class="article-footer"'), "首页不用文章页脚");
 check(!index.includes("文稿仓库"), "页面没有文稿仓库入口");
 check(!index.includes("github.com/Essight/essight.github.io"), "首页不链向文稿仓库");
 check(!index.includes("GitHub Actions"), "首页不提自动构建");
@@ -99,7 +102,7 @@ check(!csp.includes("frame-ancestors"), "meta 中不写会被忽略的 frame-anc
 check(index.includes("Observation"), "证据链保留 Observation");
 check(index.includes("完整日 L1"), "证据链保留完整日 L1");
 check(index.includes("Snapshot"), "证据链保留 Snapshot");
-check(!index.includes("/posts/"), "首页没有文章链接");
+check(index.includes("/posts/high-mention-rate-blind-spot/"), "首页链到正式文章");
 check(index.includes('src="/assets/exhibit.js"'), "首页使用站内脚本");
 check(index.includes("script-src 'self'"), "首页脚本策略允许同源脚本");
 const exhibit = fs.readFileSync(path.join(real.outDir, "assets", "exhibit.js"), "utf8");
@@ -119,8 +122,101 @@ check(index.includes('lang="zh-CN"'), "页面语言为简体中文");
 check(notFound.includes("未找到该页面"), "404 页面存在");
 check(notFound.includes('content="noindex"'), "404 不被索引");
 check(sitemap.includes("<loc>https://essight.github.io/</loc>"), "站点地图包含首页");
-check(!sitemap.includes("/posts/"), "站点地图没有文章地址");
-check(!feed.includes("<item>"), "订阅源没有文章条目");
+check(sitemap.includes("https://essight.github.io/posts/high-mention-rate-blind-spot/"), "站点地图包含文章");
+check(feed.includes("<item>"), "订阅源包含文章");
+check(feed.includes("高提及率的盲区：从一组 95%+ 的 GEO 监测样本说起"), "订阅源使用文章标题");
+
+const published = fs.readFileSync(
+  path.join(real.outDir, "posts", "high-mention-rate-blind-spot", "index.html"),
+  "utf8",
+);
+const publishedHead = published.slice(published.indexOf('class="article-head"'), published.indexOf('class="prose"'));
+check(published.includes('href="https://essight.github.io/posts/high-mention-rate-blind-spot/"'), "文章规范地址在 Pages 根路径下");
+check(published.includes('href="/assets/site.css"'), "文章页样式是站点根路径");
+check(publishedHead.includes('<time datetime="2026-11-27">2026-11-27</time>'), "文章顶部是发布日期");
+check(publishedHead.includes("品牌 A（匿名）· 两个完整七日窗 · 6 平台等权 · 每窗 294 条有效样本"), "文章顶部有数据口径");
+check(!publishedHead.includes("Essight Tech Team"), "文章顶部不重复作者");
+check(!publishedHead.includes("萃见札记"), "文章顶部不重复专栏名");
+check(!publishedHead.includes("Essight Notes"), "文章顶部不重复英文专栏名");
+check(!publishedHead.includes("约 "), "文章顶部不放阅读时长");
+{
+  let cursor = publishedHead.indexOf('class="tags"');
+  for (const tag of ["GEO", "指标设计", "AI 搜索评测", "实证分析"]) {
+    const at = publishedHead.indexOf(`>${tag}</li>`, cursor);
+    check(at > cursor, `文章标签顺序包含 ${tag}`);
+    cursor = at;
+  }
+}
+check(published.includes('"name":"Essight Tech Team"'), "作者写入结构化数据");
+for (const piece of [
+  "97.96%",
+  "95.92%",
+  "-2.04 pp",
+  "26.53%",
+  "29.25%",
+  "+2.72 pp",
+  "28.28%",
+  "37.97%",
+  "+9.69 pp",
+  "17.51%",
+  "17.40%",
+  "-0.11 pp",
+  "91.84%",
+  "77.55%",
+  "+24.06 个百分点",
+  "+12.24 个百分点",
+  "12.24 个百分点",
+  "5.63 到 5.53",
+  "83.3%",
+  "90.5%",
+  "38 至 49 条",
+  "39.6",
+  "20.8",
+  "32.7",
+  "40.8",
+  "22.4",
+  "13.3",
+  "45.8",
+  "44.9",
+  "20.4",
+  "53.1",
+  "34.7",
+  "28.9",
+  "98.0",
+  "100.0",
+  "91.8",
+  "77.6",
+]) {
+  check(published.includes(piece), `保留审定数字 ${piece}`);
+}
+{
+  const chartAt = published.indexOf('class="compare"');
+  const chart = published.slice(chartAt, chartAt + 12000);
+  let last = -1;
+  for (const name of ["豆包", "Kimi", "DeepSeek", "千问", "元宝", "文心一言"]) {
+    const at = chart.indexOf(name);
+    check(at > last, `对照图平台顺序包含 ${name}`);
+    last = at;
+  }
+}
+check(published.includes('id="compare-1-err" checked'), "对照图默认展示 ERR");
+check(!published.includes('id="compare-1-mr" checked'), "提及率不是默认项");
+check(published.includes("各平台首选推荐率（ERR）前窗与主窗对照。Kimi、千问与元宝拉升明显，DeepSeek 同期反向回落。"), "保留 ERR 图注");
+check(published.includes("各平台提及率（MR）前窗与主窗对照。其余五平台几乎满格，整窗 MR 下降几乎全部来自文心一言。"), "保留 MR 图注");
+check(published.includes("ESSIGHT NOTES · 萃见札记"), "文章页脚有眉标");
+check(
+  published.includes("萃见智能（Essight）专注于生成式搜索（GEO）监测与数据分析。本文由 Essight Tech Team 撰写。"),
+  "文章页脚有统一署名",
+);
+check(published.includes('class="article-footer"'), "文章页使用专属页脚");
+check(!published.includes('class="site-footer"'), "文章页不用首页页脚");
+check(!published.includes('href="/feed.xml">订阅</a>'), "文章页脚不放订阅");
+check(!published.includes("文稿仓库"), "文章页没有文稿仓库入口");
+check(!published.includes("github.com/Essight"), "文章页不链向文稿仓库");
+check(!published.includes("GitHub Actions"), "文章页不提自动构建");
+check(!published.includes("Pull Request"), "文章页不提 Pull Request");
+check(!/<\s*script(?![^>]*type="application\/ld\+json")/i.test(published), "文章页没有可执行脚本");
+check(published.includes("https://doi.org/10.1037/h0040957"), "参考文献保留 DOI");
 check(robots.includes("Sitemap: https://essight.github.io/sitemap.xml"), "robots 指向站点地图");
 check(css.includes(".table-wrap"), "样式包含表格容器");
 check(fs.existsSync(path.join(real.outDir, "assets", "favicon.svg")), "图标已输出");
@@ -180,6 +276,63 @@ expectThrow(
   () => renderMarkdown("[^bad\"><]: 注入\n\n见脚注[^bad\"><]。\n"),
   /脚注标记/,
   "拒绝不安全的脚注标记",
+);
+
+const chart = renderMarkdown(`\`\`\`compare
+categories:
+  - 甲
+  - 乙
+windows:
+  - 前窗
+  - 主窗
+default: mr
+series:
+  - id: err
+    label: 首选推荐率 ERR
+    caption: ERR 图注。
+    values:
+      - ["10.0", "20.0"]
+      - ["30.0", "40.0"]
+  - id: mr
+    label: 提及率 MR
+    caption: MR 图注。
+    values:
+      - ["98.0", "100.0"]
+      - ["98.0", "77.6"]
+\`\`\`
+`);
+check(chart.includes(">98.0<"), "对照图保留末尾的 0");
+check(chart.includes(">100.0<"), "对照图保留 100.0");
+check(chart.includes('type="radio"'), "对照图用单选切换");
+check(chart.includes('id="compare-1-mr" checked'), "对照图尊重 default");
+check(!chart.includes('id="compare-1-err" checked'), "未选中的指标没有 checked");
+check(!/<\s*script\b/i.test(chart), "对照图没有脚本");
+
+expectThrow(
+  () => renderMarkdown("```compare\ncategories:\n  - 甲\n"),
+  /对照图：代码块没有结束/,
+  "拒绝没有结束的对照图",
+);
+
+expectThrow(
+  () =>
+    renderMarkdown(`\`\`\`compare
+categories:
+  - 甲
+windows:
+  - 前
+  - 后
+series:
+  - id: a
+    label: A
+    caption: 注
+    values:
+      - ["10"]
+      - ["150"]
+\`\`\`
+`),
+  /超出刻度/,
+  "拒绝超出刻度的对照图数值",
 );
 
 const footnote = renderMarkdown("正文脚注[^note]。\n\n[^note]: 脚注内容。\n");
@@ -280,8 +433,13 @@ tags:
   check(article.includes("hljs-keyword"), "文章页包含高亮代码");
   check(article.includes("参考文献"), "文章页包含参考文献");
   check(article.includes("https://katex.org/"), "参考文献保留链接");
-  check(article.includes("构建脚本"), "文章页显示作者");
-  check(article.includes('class="meta-sep"'), "日期和作者之间有间隔号");
+  const formatHead = article.slice(article.indexOf('class="article-head"'), article.indexOf('class="prose"'));
+  check(formatHead.includes("2026-01-15"), "文章顶部有发布日期");
+  check(!formatHead.includes("构建脚本"), "文章顶部不重复作者");
+  check(!formatHead.includes("萃见札记"), "文章顶部不重复专栏名");
+  check(!formatHead.includes("数据口径"), "没有口径时不显示数据口径");
+  check(article.includes('"name":"构建脚本"'), "作者留在结构化数据");
+  check(home.includes('class="meta-sep"'), "列表日期与阅读时长之间有间隔号");
   check(article.includes(">自检</li>"), "文章页显示标签");
   check(article.includes("&lt;script&gt;"), "文章页转义原始 HTML");
   check(!/<\s*script(?![^>]*type="application\/ld\+json")/i.test(article), "文章页没有可执行脚本");
@@ -289,10 +447,19 @@ tags:
   check(article.includes('href="/assets/site.css"'), "文章页使用根路径样式");
   check(!article.includes("exhibit.js"), "文章页不加载展示脚本");
   check(!article.includes("文稿仓库"), "文章页没有文稿仓库入口");
-  check(article.includes('href="/feed.xml">订阅</a>'), "文章页页脚保留订阅");
+  check(article.includes('class="article-footer"'), "文章页使用统一页脚");
+  check(article.includes("ESSIGHT NOTES · 萃见札记"), "文章页脚眉标对每篇都生成");
+  check(
+    article.includes("萃见智能（Essight）专注于生成式搜索（GEO）监测与数据分析。本文由 Essight Tech Team 撰写。"),
+    "文章页脚署名为模板固定文案",
+  );
+  check(!article.includes('href="/feed.xml">订阅</a>'), "文章页脚不放订阅");
+  check(home.includes('href="/feed.xml">订阅</a>'), "首页页脚保留订阅");
+  check(!home.includes('class="article-footer"'), "首页列表页不用文章页脚");
   check(article.includes('class="toc"') && article.includes('href="#第一节"'), "文章页有目录");
   check(!other.includes('class="toc"'), "没有小节的文章不生成目录");
-  check(article.includes("约 1 分钟"), "文章页显示阅读时长");
+  check(home.includes("约 1 分钟"), "列表显示阅读时长");
+  check(!formatHead.includes("约 1 分钟"), "文章顶部不放阅读时长");
   check(article.includes("emblem emblem-hero"), "文章页有生成图形");
   check(article.includes('rel="prev"') && article.includes("/posts/sort-check/"), "较新的文章指向较早的一篇");
   check(other.includes('rel="next"') && other.includes("/posts/format-check/"), "较早的文章指向较新的一篇");
@@ -303,8 +470,16 @@ tags:
   check(home.includes('class="filters"'), "多标签时出现标签筛选");
 
   const untouched = fs.readFileSync(path.join(real.outDir, "index.html"), "utf8");
-  check(untouched.includes("暂无文章。"), "自检构建没有改写正式首页");
+  check(untouched.includes("高提及率的盲区"), "自检构建没有改写正式首页");
   check(!untouched.includes("格式自检"), "正式首页没有自检标题");
+
+  const emptyDir = path.join(tmp, "empty-posts");
+  fs.mkdirSync(emptyDir);
+  const emptyBuilt = buildFixture(emptyDir, path.join(tmp, "empty-out"));
+  check(emptyBuilt.posts === 0, "空目录构建为零篇文章");
+  const emptyHome = fs.readFileSync(path.join(tmp, "empty-out", "index.html"), "utf8");
+  check(emptyHome.includes("暂无文章。"), "没有文章时列表留一行空状态");
+  check(!emptyHome.includes("/posts/"), "没有文章时首页没有文章链接");
 
   expectThrow(
     () => {
