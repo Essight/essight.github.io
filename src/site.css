@@ -22,9 +22,6 @@
   --link: #0f5a44;
   --code-bg: #efebe1;
   --em0: var(--forest);
-  --em1: var(--accent-green);
-  --em2: #7b8984;
-  --em-grid: #cfc9bb;
 
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Noto Sans CJK SC", "Source Han Sans SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
   --serif: "Iowan Old Style", Palatino, "Palatino Linotype", "Songti SC", "Noto Serif SC", "Noto Serif CJK SC", "Source Han Serif SC", "STSong", serif;
@@ -111,62 +108,6 @@ a {
 
 .mark-core {
   fill: var(--gold);
-}
-
-/* ==========================================================================
-   Emblems: build-time generative orbit figures
-   ========================================================================== */
-
-.emblem {
-  display: block;
-  overflow: visible;
-}
-
-.em-ring {
-  fill: none;
-  stroke-width: 1.05;
-  vector-effect: non-scaling-stroke;
-}
-
-.em-ring.em-t0 {
-  stroke: var(--em0);
-}
-
-.em-ring.em-t1 {
-  stroke: var(--em1);
-}
-
-.em-ring.em-t2 {
-  stroke: var(--em2);
-}
-
-.em-dots .em-t0 {
-  fill: var(--em0);
-}
-
-.em-dots .em-t1 {
-  fill: var(--em1);
-}
-
-.em-dots .em-t2 {
-  fill: var(--em2);
-}
-
-.em-grid {
-  fill: var(--em-grid);
-}
-
-.em-gold {
-  fill: var(--gold);
-}
-
-.em-core {
-  fill: var(--ink);
-}
-
-.em-spin {
-  transform-box: view-box;
-  transform-origin: 60px 60px;
 }
 
 /* ==========================================================================
@@ -281,26 +222,6 @@ body.read {
 .article-head {
   position: relative;
   padding: clamp(3rem, 9vh, 5.5rem) 0 2.2rem;
-}
-
-.emblem-hero {
-  position: absolute;
-  z-index: -1;
-  top: 1.2rem;
-  right: -2rem;
-  width: clamp(9rem, 26vw, 15rem);
-  height: auto;
-  opacity: 0.55;
-}
-
-.emblem-hero .em-spin {
-  animation: em-spin 120s linear infinite;
-}
-
-@keyframes em-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .article-title {
@@ -483,10 +404,6 @@ body.read {
 
   .has-toc .toc summary::-webkit-details-marker {
     display: none;
-  }
-
-  .has-toc .emblem-hero {
-    right: 0;
   }
 }
 
@@ -1134,11 +1051,6 @@ code {
     font-size: 0.8rem;
   }
 
-  .emblem-hero {
-    right: -1rem;
-    opacity: 0.35;
-  }
-
   .pager {
     grid-template-columns: 1fr;
   }
@@ -1155,9 +1067,6 @@ code {
     --link: #7fdcb5;
     --code-bg: #10211c;
     --em0: var(--bamboo);
-    --em1: #3aa781;
-    --em2: #6f7f79;
-    --em-grid: #23362f;
   }
 
   body.read .hljs-keyword,
@@ -2028,10 +1937,6 @@ body.exhibit {
   --faint: #66726d;
   --line: #e0dacd;
   --link: #0f5a44;
-  --em0: var(--forest);
-  --em1: var(--accent-green);
-  --em2: #7b8984;
-  --em-grid: #d8d2c4;
 }
 
 .js .archive:not(.is-open) {
@@ -2050,7 +1955,11 @@ body.exhibit {
   width: min(60rem, calc(100% - 2.5rem));
   min-height: 100svh;
   margin-inline: auto;
-  padding: clamp(5rem, 14vh, 9rem) 0 0 clamp(0rem, 6vw, 5rem);
+  padding: clamp(5rem, 10vh, 6.5rem) 0 0 clamp(0rem, 6vw, 5rem);
+}
+
+.archive .kicker {
+  margin-bottom: 0.5rem;
 }
 
 .archive .kicker-ink {
@@ -2061,24 +1970,25 @@ body.exhibit {
   color: var(--forest);
 }
 
-.archive h2 {
-  margin: 0 0 clamp(2rem, 6vh, 3.5rem);
+.exhibit .archive h2 {
+  margin: 0 0 1.35rem;
   color: var(--ink-0);
-  font-size: clamp(3.4rem, 10vw, 7.4rem);
+  /* 22px, two steps above the 0.76rem (12.16px) kicker. */
+  font-size: 1.375rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  line-height: 1;
+  letter-spacing: 0.04em;
+  line-height: 1.25;
 }
 
 .archive h2::after {
   content: "";
   display: inline-block;
-  width: 0.16em;
-  height: 0.16em;
-  margin-left: 0.08em;
+  width: 0.32em;
+  height: 0.32em;
+  margin-left: 0.16em;
   border-radius: 50%;
   background: var(--gold);
-  vertical-align: baseline;
+  vertical-align: 0.08em;
 }
 
 .archive h2:focus {
@@ -2151,10 +2061,10 @@ body.exhibit {
 .post article {
   position: relative;
   display: grid;
-  grid-template-columns: 2.6rem 5.5rem minmax(0, 1fr) 2rem;
-  gap: 0 1.5rem;
+  grid-template-columns: 2.25rem minmax(0, 1fr) 2rem;
+  column-gap: 1.35rem;
   align-items: start;
-  padding: 1.8rem 0;
+  padding: 1.55rem 0;
   border-top: 1px solid var(--line);
 }
 
@@ -2184,20 +2094,6 @@ body.exhibit {
   font-weight: 600;
   letter-spacing: 0.08em;
   font-variant-numeric: tabular-nums;
-}
-
-.emblem-card {
-  width: 5.5rem;
-  height: 5.5rem;
-}
-
-.emblem-card .em-spin {
-  transition: transform 1.2s var(--ease-out);
-}
-
-.post article:hover .emblem-card .em-spin,
-.post article:focus-within .emblem-card .em-spin {
-  transform: rotate(60deg);
 }
 
 .post-body .post-meta {
@@ -2286,18 +2182,16 @@ body.exhibit {
 
 @media (max-width: 720px) {
   .post article {
-    grid-template-columns: 4rem minmax(0, 1fr);
-    gap: 0 1rem;
+    grid-template-columns: 1.7rem minmax(0, 1fr) 1.25rem;
+    column-gap: 0.7rem;
+    padding: 1.3rem 0;
   }
 
-  .post-index,
   .post-arrow {
-    display: none;
-  }
-
-  .emblem-card {
-    width: 4rem;
-    height: 4rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    opacity: 0.72;
+    transform: none;
   }
 }
 
@@ -2487,10 +2381,6 @@ body.exhibit {
     animation: none;
     display: none;
   }
-
-  .emblem-hero .em-spin {
-    animation: none;
-  }
 }
 
 @media print {
@@ -2504,8 +2394,7 @@ body.exhibit {
   .read-progress,
   .cue,
   .toc,
-  .pager,
-  .emblem-hero {
+  .pager {
     display: none;
   }
 
