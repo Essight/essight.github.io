@@ -3,7 +3,6 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { buildSite } from "../lib/build-site.mjs";
-import { emblemSvg } from "../lib/emblem.mjs";
 import { renderMarkdown } from "../lib/markdown.mjs";
 import { extractToc, readingMinutes } from "../lib/reading.mjs";
 
@@ -67,6 +66,9 @@ const katexCss = fs.readFileSync(path.join(real.outDir, "assets", "katex", "kate
 
 check(real.posts === 1, "正式构建包含一篇文章");
 check(index.includes("萃见札记"), "首页有中文名称");
+const archiveHead = index.slice(index.indexOf('class="archive-inner"'), index.indexOf('id="archive-heading"'));
+check(!archiveHead.includes("kicker") && !archiveHead.includes("萃见札记"), "文章区标题上方不再重复眉标");
+check(!css.includes(".archive h2::after"), "文章标题没有装饰圆点");
 check(index.includes("Essight Notes"), "首页有英文名称");
 check(!index.includes("数据科学专栏"), "首页不再使用旧栏目名");
 check(!notFound.includes("数据科学专栏"), "404 不再使用旧栏目名");
@@ -386,10 +388,10 @@ check(footnote.includes("footnotes"), "脚注生成列表");
 check(footnote.includes("脚注内容"), "脚注保留正文");
 check(footnote.includes(">脚注</h2>") || footnote.includes(">脚注<"), "脚注标题为中文");
 
-const emblemA = emblemSvg("alpha-post");
-check(emblemA === emblemSvg("alpha-post"), "同一 slug 的生成图形保持一致");
-check(emblemA !== emblemSvg("beta-post"), "不同 slug 的生成图形不同");
-check(!/<script|on[a-z]+=/i.test(emblemA), "生成图形是纯 SVG");
+check(!index.includes("emblem-card") && !index.includes('class="emblem'), "首页文章行没有轨道图标");
+check(index.includes('class="post-index"'), "首页文章行保留序号");
+check(index.includes('class="post-arrow"'), "首页文章行保留箭头");
+check(!published.includes("emblem"), "文章页不包含首页行图标");
 
 check(readingMinutes("<p>" + "字".repeat(2100) + "</p>") === 5, "阅读时长按中文字数估算");
 check(readingMinutes("<p>短</p>") === 1, "阅读时长至少一分钟");
@@ -516,13 +518,13 @@ tags:
   check(!other.includes('class="toc"'), "没有小节的文章不生成目录");
   check(home.includes("约 1 分钟"), "列表显示阅读时长");
   check(!formatHead.includes("约 1 分钟"), "文章顶部不放阅读时长");
-  check(home.includes("emblem emblem-card"), "列表保留生成图形");
+  check(!home.includes("emblem-card") && !home.includes('class="emblem'), "列表不再放轨道图标");
+  check(home.includes('class="post-index"') && home.includes('class="post-arrow"'), "列表保留序号和箭头");
   check(article.includes('rel="prev"') && article.includes("/posts/sort-check/"), "较新的文章指向较早的一篇");
   check(other.includes('rel="next"') && other.includes("/posts/format-check/"), "较早的文章指向较新的一篇");
   check(article.includes('content="light dark"'), "文章页跟随系统深浅色");
   check(article.includes("view-transition-name: post-format-check"), "文章标题参与视图过渡");
   check(home.includes("view-transition-name: post-format-check"), "列表标题参与视图过渡");
-  check(home.includes("emblem emblem-card"), "列表有生成图形");
   check(home.includes('class="filters"'), "多标签时出现标签筛选");
 
   const untouched = fs.readFileSync(path.join(real.outDir, "index.html"), "utf8");
