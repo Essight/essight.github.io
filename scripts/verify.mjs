@@ -66,6 +66,7 @@ check(!index.includes("暂无已发布文章"), "空状态不再解释发布条�
 check(index.includes("高提及率的盲区：从一组 95%+ 的 GEO 监测样本说起"), "首页文章幕露出标题");
 check(index.includes('href="/posts/high-mention-rate-blind-spot/"'), "首页文章链接是站点根路径");
 check(!index.includes('class="article-footer"'), "首页不用文章页脚");
+check(!index.includes("本文由"), "首页不出现文章落款");
 check(!index.includes("文稿仓库"), "页面没有文稿仓库入口");
 check(!index.includes("github.com/Essight/essight.github.io"), "首页不链向文稿仓库");
 check(!index.includes("GitHub Actions"), "首页不提自动构建");
@@ -212,9 +213,11 @@ check(
   published.includes("萃见智能（Essight）专注于生成式搜索（GEO）监测与数据分析。本文由 Essight Tech Team 撰写。"),
   "文章页脚有统一署名",
 );
-check(published.includes('class="article-footer"'), "文章页使用专属页脚");
-check(!published.includes('class="site-footer"'), "文章页不用首页页脚");
-check(!published.includes('href="/feed.xml">订阅</a>'), "文章页脚不放订阅");
+check(published.includes('class="article-footer"'), "文章页使用文末署名");
+check(published.indexOf('class="article-footer"') < published.indexOf('class="site-footer"'), "文末署名在站点页脚之前");
+check(published.includes('class="site-footer"'), "文章页保留站点页脚");
+check(published.includes('href="/feed.xml">订阅</a>'), "文章页站点页脚保留订阅");
+check(!published.includes("emblem-hero"), "文章页标题区没有装饰图形");
 check(!published.includes("文稿仓库"), "文章页没有文稿仓库入口");
 check(!published.includes("github.com/Essight"), "文章页不链向文稿仓库");
 check(!published.includes("GitHub Actions"), "文章页不提自动构建");
@@ -451,20 +454,23 @@ tags:
   check(article.includes(`href="${cssHref}"`), "文章页使用根路径样式");
   check(!article.includes("exhibit.js"), "文章页不加载展示脚本");
   check(!article.includes("文稿仓库"), "文章页没有文稿仓库入口");
-  check(article.includes('class="article-footer"'), "文章页使用统一页脚");
+  check(article.includes('class="article-footer"'), "文章页使用统一文末署名");
   check(article.includes("ESSIGHT NOTES · 萃见札记"), "文章页脚眉标对每篇都生成");
   check(
     article.includes("萃见智能（Essight）专注于生成式搜索（GEO）监测与数据分析。本文由 Essight Tech Team 撰写。"),
     "文章页脚署名为模板固定文案",
   );
-  check(!article.includes('href="/feed.xml">订阅</a>'), "文章页脚不放订阅");
+  check(article.includes('class="site-footer"'), "文章页保留站点页脚");
+  check(article.includes('href="/feed.xml">订阅</a>'), "文章页站点页脚保留订阅");
+  check(!article.includes("emblem-hero"), "文章页标题区没有装饰图形");
   check(home.includes('href="/feed.xml">订阅</a>'), "首页页脚保留订阅");
   check(!home.includes('class="article-footer"'), "首页列表页不用文章页脚");
+  check(!home.includes("本文由"), "首页不出现文章落款");
   check(article.includes('class="toc"') && article.includes('href="#第一节"'), "文章页有目录");
   check(!other.includes('class="toc"'), "没有小节的文章不生成目录");
   check(home.includes("约 1 分钟"), "列表显示阅读时长");
   check(!formatHead.includes("约 1 分钟"), "文章顶部不放阅读时长");
-  check(article.includes("emblem emblem-hero"), "文章页有生成图形");
+  check(home.includes("emblem emblem-card"), "列表保留生成图形");
   check(article.includes('rel="prev"') && article.includes("/posts/sort-check/"), "较新的文章指向较早的一篇");
   check(other.includes('rel="next"') && other.includes("/posts/format-check/"), "较早的文章指向较新的一篇");
   check(article.includes('content="light dark"'), "文章页跟随系统深浅色");
