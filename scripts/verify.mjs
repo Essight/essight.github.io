@@ -66,6 +66,9 @@ const katexCss = fs.readFileSync(path.join(real.outDir, "assets", "katex", "kate
 
 check(real.posts === 1, "正式构建包含一篇文章");
 check(index.includes("萃见札记"), "首页有中文名称");
+const archiveHead = index.slice(index.indexOf('class="archive-inner"'), index.indexOf('id="archive-heading"'));
+check(!archiveHead.includes("kicker") && !archiveHead.includes("萃见札记"), "文章区标题上方不再重复眉标");
+check(!css.includes(".archive h2::after"), "文章标题没有装饰圆点");
 check(index.includes("Essight Notes"), "首页有英文名称");
 check(!index.includes("数据科学专栏"), "首页不再使用旧栏目名");
 check(!notFound.includes("数据科学专栏"), "404 不再使用旧栏目名");

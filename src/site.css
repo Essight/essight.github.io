@@ -1955,40 +1955,16 @@ body.exhibit {
   width: min(60rem, calc(100% - 2.5rem));
   min-height: 100svh;
   margin-inline: auto;
-  padding: clamp(5rem, 10vh, 6.5rem) 0 0 clamp(0rem, 6vw, 5rem);
-}
-
-.archive .kicker {
-  margin-bottom: 0.5rem;
-}
-
-.archive .kicker-ink {
-  color: var(--forest);
-}
-
-.archive .kicker-ink .mark {
-  color: var(--forest);
+  padding: clamp(5rem, 9vh, 5.75rem) 0 0 clamp(0rem, 6vw, 5rem);
 }
 
 .exhibit .archive h2 {
   margin: 0 0 1.35rem;
   color: var(--ink-0);
-  /* 22px, two steps above the 0.76rem (12.16px) kicker. */
   font-size: 1.375rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1.25;
-}
-
-.archive h2::after {
-  content: "";
-  display: inline-block;
-  width: 0.32em;
-  height: 0.32em;
-  margin-left: 0.16em;
-  border-radius: 50%;
-  background: var(--gold);
-  vertical-align: 0.08em;
 }
 
 .archive h2:focus {
