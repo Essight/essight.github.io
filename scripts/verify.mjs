@@ -19,6 +19,16 @@ function check(condition, message) {
   console.error(`失败：${message}`);
 }
 
+function readArticleJsonLd(html) {
+  const blocks = [...html.matchAll(/<script type="application\/ld\+json">([^<]*)<\/script>/g)];
+  if (blocks.length !== 1) return { error: `结构化数据脚本数量为 ${blocks.length}` };
+  try {
+    return { data: JSON.parse(blocks[0][1]) };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : String(error) };
+  }
+}
+
 function expectThrow(fn, pattern, message) {
   try {
     fn();
@@ -152,7 +162,25 @@ check(!publishedHead.includes("约 "), "文章顶部不放阅读时长");
     cursor = at;
   }
 }
-check(published.includes('"name":"Essight Tech Team"'), "作者写入结构化数据");
+{
+  const articleDir = path.join(real.outDir, "posts");
+  const articleSlugs = fs
+    .readdirSync(articleDir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
+  check(articleSlugs.length === real.posts && articleSlugs.length > 0, "每篇文章都生成了页面");
+  const expectedAuthor = JSON.stringify({ "@type": "Organization", name: "Essight Tech Team" });
+  for (const slug of articleSlugs) {
+    const html = fs.readFileSync(path.join(articleDir, slug, "index.html"), "utf8");
+    const parsed = readArticleJsonLd(html);
+    check(!parsed.error, `${slug} 的 application/ld+json 是合法 JSON${parsed.error ? `（${parsed.error}）` : ""}`);
+    check(
+      JSON.stringify(parsed.data?.author) === expectedAuthor,
+      `${slug} 的 author 为 {"@type":"Organization","name":"Essight Tech Team"}`,
+    );
+  }
+}
 for (const piece of [
   "97.96%",
   "95.92%",
@@ -445,7 +473,14 @@ tags:
   check(!formatHead.includes("构建脚本"), "文章顶部不重复作者");
   check(!formatHead.includes("萃见札记"), "文章顶部不重复专栏名");
   check(!formatHead.includes("数据口径"), "没有口径时不显示数据口径");
-  check(article.includes('"name":"构建脚本"'), "作者留在结构化数据");
+  {
+    const parsed = readArticleJsonLd(article);
+    check(!parsed.error, `自检文章的 application/ld+json 是合法 JSON${parsed.error ? `（${parsed.error}）` : ""}`);
+    check(
+      JSON.stringify(parsed.data?.author) === JSON.stringify({ "@type": "Organization", name: "构建脚本" }),
+      "自检文章的 author 类型为 Organization，并保留 frontmatter 署名",
+    );
+  }
   check(home.includes('class="meta-sep"'), "列表日期与阅读时长之间有间隔号");
   check(article.includes(">自检</li>"), "文章页显示标签");
   check(article.includes("&lt;script&gt;"), "文章页转义原始 HTML");
